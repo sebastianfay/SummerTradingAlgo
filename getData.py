@@ -9,4 +9,16 @@ import requests
 
 apiKey = "LFUM3T5DS62ZKDC0"
 
-# =======================   RSI     
+# get all the tickers in stockList.txt into a data structure called stockList
+with open('stockList.txt', 'r') as myfile:
+  stockList = myfile.read().splitlines()
+
+fp = "https://www.alphavantage.co/query?function=RSI&symbol="
+lp = "&interval=1min&time_period=14&series_type=close&apikey=LFUM3T5DS62ZKDC0"
+requestString = fp + "I" + lp
+data_rsi = requests.get(requestString).json()
+
+dataRSI = []
+
+for daily in data_rsi['Technical Analysis: RSI']:
+    dataRSI.append(data_rsi['Technical Analysis: RSI'][daily]['RSI'])

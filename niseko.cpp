@@ -19,10 +19,20 @@
 class Niseko{
 public:
 
-public:
+  struct dataPoint{
+    double rsi;
+    double price;
+    double macd;
+    double macdHist;
+    double macdSig;
+  };  //dataPoint
 
-};
+
+
+public:
+  vector<dataPoint> data;
+};  //Niseko
 
 int main(){
   return 0;
-}
+}   //main
