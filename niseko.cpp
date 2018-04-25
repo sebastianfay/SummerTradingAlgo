@@ -19,6 +19,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -26,13 +28,40 @@ class Niseko{
 public:
 
   struct dataPoint{
+    double price;
+    double rsi;
+    double macd;
+    double macdSig;
+    double macdHist;
+  };  //dataPoint
+
+  void readInData(string ticker){
+    string fileName = ticker + ".out";
+    cout << fileName << endl;
+    ifstream inFile(fileName);
+
+    if (!inFile.is_open()){
+      string errorMessage = "Couldn't open " + ticker + ".out";
+      throw runtime_error(errorMessage);
+    }
+    else{ cout << "Opened " << ticker << ".out successfully!\n";}
+
+    string temp;
     double rsi;
     double price;
     double macd;
     double macdHist;
     double macdSig;
-  };  //dataPoint
-
+    while (inFile >> temp >> temp >> price >> rsi >> macd >> macdSig >> macdHist) {
+      dataPoint temp;
+      temp.price = price;
+      temp.rsi = rsi;
+      temp.macd = macd;
+      temp.macdSig = macdSig;
+      temp.macdHist = macdHist;
+      data.push_back(temp);
+    }
+  }   //readInData
 
 
 public:
@@ -42,6 +71,16 @@ public:
 int main(){
   std::ios_base::sync_with_stdio(false);  //for speed
 
-  
+  //main block
+  try{
+    Niseko snow;
+    snow.readInData("I");
+  }
+  catch(runtime_error &error) {
+    cerr << error.what() << endl;
+    return 1;
+  }
+
+
   return 0;
 }   //main
