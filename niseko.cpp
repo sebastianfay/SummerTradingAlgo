@@ -40,5 +40,8 @@ public:
 };  //Niseko
 
 int main(){
+  std::ios_base::sync_with_stdio(false);  //for speed
+
+  
   return 0;
 }   //main
