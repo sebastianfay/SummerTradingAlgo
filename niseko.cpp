@@ -16,6 +16,12 @@
 // This strategy uses mean reversion techniques to verify a forming short term
 // trend, or vis versa.
 
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
 class Niseko{
 public:
 
