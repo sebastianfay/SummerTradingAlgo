@@ -103,7 +103,7 @@ public:
       }
     }
     return false;
-  }
+  }   //findCrosses
 
   void runnit(){
     if (findCrosses()) {
@@ -124,14 +124,18 @@ public:
       }
       else{
         cout << "It has been to long between the RSI crossover and the MACD"
-        << " crossover. This might indicate against a trend forming.\n";
+        << " crossover for " << ticker << ". This might indicate against a trend forming.\n";
       }
+    }
+    else{
+      cout << "There has not been an RSI and MACD crossover in the right order recently for "
+      << ticker << endl;
     }
   }   //runnit
 
 void printBuy(){
   cout << "Buy " << ticker << " right now\n";
-}
+}   //printBuy
 
 public:
   vector<dataPoint> data;
@@ -144,14 +148,28 @@ int main(){
   std::ios_base::sync_with_stdio(false);  //for speed
 
   //main try block
-  try{
-    Niseko snow("I");
-    snow.readInData();
-    snow.runnit();
+  ifstream inFile("stockList.txt");
+  if (!inFile.is_open()){
+    cout << "Couldn't open stockList.txt\n";
   }
-  catch(runtime_error &error) {
-    cerr << error.what() << endl;
-    return 1;
+
+  vector<string> tickers;
+
+  string tempTicker;
+  while (inFile >> tempTicker) {
+    tickers.push_back(tempTicker);
+  }
+
+  for (size_t i = 0; i < tickers.size(); ++i) {
+    try{
+      Niseko snow(tickers[i]);
+      snow.readInData();
+      snow.runnit();
+    }
+    catch(runtime_error &error) {
+      cerr << error.what() << endl;
+      return 1;
+    }
   }
 
   return 0;
