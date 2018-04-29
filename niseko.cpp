@@ -37,8 +37,8 @@ public:
   Niseko(string tickerName) {
     ticker = tickerName;
     data.reserve(100);
-    foundRsi = false;
-    foundMacd = false;
+    validRsi = false;
+    validMacd = false;
   }   //Niseko
 
   void readInData() {
@@ -69,16 +69,40 @@ public:
   }   //readInData
 
   void findRsiCross() {
-    size_t index = 1;
-    while (!foundRsi) {
+    size_t index = 0;
+    if (data[index].rsi <= 30) {
+      return;
+    }
+    while (!foundRsi && index < 35) {
       if (data[index].rsi <= 30) {
-        foundRsi = true;
+        validRsi = true;
         rsiIndex = index;
-        return;
       }
       ++index;
     }
-  }
+  }   //findRsiCross
+
+
+  void macdAnalysis() {
+    if (data[0].macdHist > 0) {
+      double prevHist = data[0].macdHist;
+      size_t index = 1;
+      while (data[index].macdHist >= 0) {
+        if (data[index].macdHist >= prevHist) {
+          return;
+        }
+        ++index;
+      }
+      if (index < 5) {
+        validMacd = true;
+        macdIndex = index;
+        return;
+      }
+    }
+    else {
+
+    }
+  }   //macdAnalysis
 
   bool verifyPreMACD(){
     for (size_t i = macdIndex; i < macdIndex + 40; i++) {
@@ -119,6 +143,11 @@ public:
     return false;
   }   //findCrosses
 
+  void runDat() {
+    findRsiCross();
+    if (validRsi) {}
+  }
+
   void runnit() {
     if (findCrosses()) {
       if (rsiIndex - macdIndex <= 30) {
@@ -154,9 +183,9 @@ void printBuy(){
 public:
   vector<dataPoint> data;
   size_t rsiIndex;
-  bool foundRsi;
+  bool validRsi;
   size_t macdIndex;
-  bool foundMacd;
+  bool validMacd;
   string ticker;
 };  //Niseko
 
