@@ -20,6 +20,8 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
+#include <thread>   //sleep_for()
+#include <chrono>   //seconds
 
 using namespace std;
 
@@ -184,31 +186,33 @@ public:
 int main(){
   std::ios_base::sync_with_stdio(false);  //for speed
 
-  //main try block
-  ifstream inFile("stockList.txt");
-  if (!inFile.is_open()){
-    cout << "Couldn't open stockList.txt\n";
-  }
-
-  vector<string> tickers;
-
-  string tempTicker;
-  while (inFile >> tempTicker) {
-    tickers.push_back(tempTicker);
-  }
-
-  for (size_t i = 0; i < tickers.size(); ++i) {
-    try{
-      Niseko snow(tickers[i]);
-      snow.readInData();
-      snow.runDat();
-      snow.printSummary();
+  while (true) {
+    //main try block
+    ifstream inFile("stockList.txt");
+    if (!inFile.is_open()){
+      cout << "Couldn't open stockList.txt\n";
     }
-    catch(runtime_error &error) {
-      cerr << error.what() << endl;
-      return 1;
+
+    vector<string> tickers;
+
+    string tempTicker;
+    while (inFile >> tempTicker) {
+      tickers.push_back(tempTicker);
     }
-  }
+
+    for (size_t i = 0; i < tickers.size(); ++i) {
+      try{
+        Niseko snow(tickers[i]);
+        snow.readInData();
+        snow.runDat();
+        snow.printSummary();
+      }
+      catch(runtime_error &error) {
+        cerr << error.what() << endl;
+      }
+    }
+    std::this_thread::sleep_for (std::chrono::seconds(60));
+    }
 
   return 0;
 }   //main
