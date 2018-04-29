@@ -39,6 +39,7 @@ public:
     data.reserve(100);
     validRsi = false;
     validMacd = false;
+    priceIncreasing = false;
   }   //Niseko
 
   void readInData() {
@@ -73,7 +74,7 @@ public:
     if (data[index].rsi <= 30) {
       return;
     }
-    while (!foundRsi && index < 35) {
+    while (!validRsi && index < 35) {
       if (data[index].rsi <= 30) {
         validRsi = true;
         rsiIndex = index;
@@ -84,7 +85,6 @@ public:
 
 
   void macdAnalysis() {
-    
     macdPos = ((data[0].macdHist > 0) ? true : false);
 
     if (macdPos) {
@@ -110,86 +110,65 @@ public:
         prevHist = data[index].macdHist;
       }
       if (index >= 4 && index + 5 > rsiIndex) {
+        macdIndex = index;
         validMacd = true;
       }
     }
   }   //macdAnalysis
 
-  bool verifyPreMACD(){
-    for (size_t i = macdIndex; i < macdIndex + 40; i++) {
-      if (data[i].macdHist > 0) {
-        return false;
-      }
-    }
-    return true;
-  }   //verifyPreMACD
-
-  bool verifyPriceIncrease() {
-    if (data[macdIndex].price >= data[rsiIndex].price) {
-      return true;
-    }
-    return false;
-  }   //verifyPriceIncrease
-
-  bool findCrosses() {
-    bool foundRsi = false;
-    bool foundMacd = false;
-    for (size_t i = 0; i < data.size(); ++i) {
-      if (data[i].macdHist <= 0 && !foundMacd) {
-        macdIndex = i;
-        foundMacd = true;
-        // cout << macdIndex << endl;
-      }
-      if (data[i].rsi <= 30.0 && !foundRsi) {
-        rsiIndex = i;
-        foundRsi = true;
-        // cout << rsiIndex << endl;
-      }
-    }
-    if (foundRsi && foundMacd) {
-      if (macdIndex < rsiIndex) {
-        return true;
-      }
-    }
-    return false;
-  }   //findCrosses
+  void priceGoingUp() {
+    priceIncreasing = data[0].price > data[rsiIndex].price;
+  }   //priceGoingUp
 
   void runDat() {
     findRsiCross();
-    if (validRsi) {}
+    if (validRsi) {macdAnalysis();}
+    if (validMacd) {priceGoingUp();}
+
   }
 
-  void runnit() {
-    if (findCrosses()) {
-      if (rsiIndex - macdIndex <= 30) {
-        if (verifyPreMACD()) {
-          if (verifyPriceIncrease()) {
-            printBuy();
-          }
-          else{
-          cout << "The price of " << ticker << " has not gone up between the RSI"
-           << " cross over 30 and the bullish MACD crossover. It looks like"
-           << " there is not a trend forming.\nDont buy it.\n";
-          }
-        }
-        else{
-          cout << "The MACD Histogram for " << ticker << " has not been negative for enough time.\n";
-        }
-      }
-      else{
-        cout << "It has been to long between the RSI crossover and the MACD"
-        << " crossover for " << ticker << ". This might indicate against a trend forming.\n";
-      }
-    }
-    else{
-      cout << "There has not been an RSI and MACD crossover in the right order recently for "
-      << ticker << endl;
-    }
-  }   //runnit
+void printSummary(){
+  cout << "-------------------------------------------------------------\n";
+  cout << endl << ticker << endl;
 
-void printBuy(){
-  cout << "Buy " << ticker << " right now\n";
-}   //printBuy
+  if (validRsi) {
+    cout << "RSI: Valid\n";
+    cout << "RSI crossed above 30, " << rsiIndex << " minutes ago\n";
+  } else {
+    cout << "RSI: Not valid\n";
+  }
+  cout << endl;
+
+  if (validMacd) {
+    cout << "MACD: Valid\n";
+    if (macdPos) {
+      cout << "MACD HIST: Positive\n";
+      cout << "MACD crossed " << macdIndex << " minutes ago\n";
+    } else {
+      cout << "MACD HIST: Negative\n";
+      cout << "Has been increasing for " << macdIndex << " minutes\n";
+    }
+  } else{
+    cout << "MACD: Not valid\n";
+  }
+  cout << endl;
+
+  if (priceIncreasing) {
+    cout << "Price has been increasing since RSI cross\n";
+  } else {
+    cout << "Price has NOT been increasing since RSI cross\n";
+  }
+  cout << endl;
+
+  if (validRsi && validMacd && priceIncreasing) {
+    cout << "BUY " << ticker << endl;
+  } else {
+    cout << "DO NOT BUY " << ticker << endl;
+  }
+  cout << endl;
+
+  cout << "-------------------------------------------------------------\n";
+}
 
 public:
   vector<dataPoint> data;
@@ -198,6 +177,7 @@ public:
   size_t macdIndex;
   bool validMacd;
   bool macdPos;
+  bool priceIncreasing;
   string ticker;
 };  //Niseko
 
@@ -221,7 +201,8 @@ int main(){
     try{
       Niseko snow(tickers[i]);
       snow.readInData();
-      snow.runnit();
+      snow.runDat();
+      snow.printSummary();
     }
     catch(runtime_error &error) {
       cerr << error.what() << endl;
