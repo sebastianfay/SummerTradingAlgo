@@ -84,7 +84,10 @@ public:
 
 
   void macdAnalysis() {
-    if (data[0].macdHist > 0) {
+    
+    macdPos = ((data[0].macdHist > 0) ? true : false);
+
+    if (macdPos) {
       double prevHist = data[0].macdHist;
       size_t index = 1;
       while (data[index].macdHist >= 0) {
@@ -93,14 +96,22 @@ public:
         }
         ++index;
       }
-      if (index < 5) {
+      if (index < 5 && index + 10 < rsiIndex) {
         validMacd = true;
         macdIndex = index;
         return;
       }
     }
     else {
-
+      double prevHist = data[0].macdHist;
+      size_t index = 1;
+      while (data[index].macdHist < prevHist) {
+        ++index;
+        prevHist = data[index].macdHist;
+      }
+      if (index >= 4 && index + 5 > rsiIndex) {
+        validMacd = true;
+      }
     }
   }   //macdAnalysis
 
@@ -186,6 +197,7 @@ public:
   bool validRsi;
   size_t macdIndex;
   bool validMacd;
+  bool macdPos;
   string ticker;
 };  //Niseko
 
