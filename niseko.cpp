@@ -23,10 +23,10 @@
 
 using namespace std;
 
-class Niseko{
+class Niseko {
 public:
 
-  struct dataPoint{
+  struct dataPoint {
     double price;
     double rsi;
     double macd;
@@ -34,12 +34,14 @@ public:
     double macdHist;
   };  //dataPoint
 
-  Niseko(string tickerName){
+  Niseko(string tickerName) {
     ticker = tickerName;
     data.reserve(100);
+    foundRsi = false;
+    foundMacd = false;
   }   //Niseko
 
-  void readInData(){
+  void readInData() {
     string fileName = ticker + ".out";
     //cout << fileName << endl;
     ifstream inFile(fileName);
@@ -66,6 +68,18 @@ public:
     }
   }   //readInData
 
+  void findRsiCross() {
+    size_t index = 1;
+    while (!foundRsi) {
+      if (data[index].rsi <= 30) {
+        foundRsi = true;
+        rsiIndex = index;
+        return;
+      }
+      ++index;
+    }
+  }
+
   bool verifyPreMACD(){
     for (size_t i = macdIndex; i < macdIndex + 40; i++) {
       if (data[i].macdHist > 0) {
@@ -75,14 +89,14 @@ public:
     return true;
   }   //verifyPreMACD
 
-  bool verifyPriceIncrease(){
+  bool verifyPriceIncrease() {
     if (data[macdIndex].price >= data[rsiIndex].price) {
       return true;
     }
     return false;
   }   //verifyPriceIncrease
 
-  bool findCrosses(){
+  bool findCrosses() {
     bool foundRsi = false;
     bool foundMacd = false;
     for (size_t i = 0; i < data.size(); ++i) {
@@ -105,7 +119,7 @@ public:
     return false;
   }   //findCrosses
 
-  void runnit(){
+  void runnit() {
     if (findCrosses()) {
       if (rsiIndex - macdIndex <= 30) {
         if (verifyPreMACD()) {
@@ -140,7 +154,9 @@ void printBuy(){
 public:
   vector<dataPoint> data;
   size_t rsiIndex;
+  bool foundRsi;
   size_t macdIndex;
+  bool foundMacd;
   string ticker;
 };  //Niseko
 
