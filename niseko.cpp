@@ -193,6 +193,10 @@ int main(){
       cout << "Couldn't open stockList.txt\n";
     }
 
+    // append to the end of a file
+    // ofstream outFile("ARGS.out", std::ios_base::app);
+    // outFile << "penis" << endl;
+
     vector<string> tickers;
 
     string tempTicker;
