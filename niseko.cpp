@@ -164,6 +164,14 @@ void printSummary(){
 
   if (validRsi && validMacd && priceIncreasing) {
     cout << "BUY " << ticker << endl;
+
+    auto rn = std::chrono::system_clock::now();
+
+    std::time_t end_time = std::chrono::system_clock::to_time_t(rn);
+
+
+    ofstream outFile("buys.txt", std::ios_base::app);
+    outFile << "BUY" << ticker << " at " << std::ctime(&end_time) << endl;
   } else {
     cout << "DO NOT BUY " << ticker << endl;
   }
@@ -181,6 +189,7 @@ public:
   bool macdPos;
   bool priceIncreasing;
   string ticker;
+  string currentTime;
 };  //Niseko
 
 int main(){
