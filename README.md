@@ -17,12 +17,12 @@ I have not decided how I will decide my **trade size**, updates to come.
 
 
 ## Whats in the Repo
-GetData.py:
+**GetData.py:**
 
-niseko.cpp:
+**niseko.cpp:**
 
-tradeLog.h:
+**tradeLog.h:**
 
-tradeTracker.cpp
+**tradeTracker.cpp**
 
-trades.txt:
+**trades.txt:**
