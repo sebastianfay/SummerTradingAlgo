@@ -26,3 +26,6 @@ This is a c++ file that reads in the parsed stock data from the python script an
 
 **trades.txt:**
 This is a trade log where each trade will have the trade entry and exit data, and well as my reasons for taking action on each side. 
+
+**Makefile:**
+This makes compiling the c++ file much simpler. Additionally, the python script generates a .out file for every ticker and this make files allows me to easily delete all the .out files when the c++ file is done. 
