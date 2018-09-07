@@ -15,82 +15,54 @@ with open('stockList.txt', 'r') as myfile:
   stockList = myfile.read().splitlines()
 
 # for ticker in stockList:
+ticker = "SPY"
 
-ticker = "UDOW"
-# Getting the RSI data
-fp = "https://www.alphavantage.co/query?function=RSI&symbol="
-lp = "&interval=1min&time_period=14&series_type=close&apikey=LFUM3T5DS62ZKDC0"
+# Getting the daily price data
+fp = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol="
+lp = "&outputsize=full&apikey=LFUM3T5DS62ZKDC0"
 requestString = fp + ticker + lp
-data_rsi = requests.get(requestString).json()
+data_time_series = requests.get(requestString).json()
 
-print(data_rsi)
-
-print(data_rsi.keys())
-
-dataRSI = []
-
-for daily in data_rsi['Technical Analysis: RSI']:
-    dataRSI.append(data_rsi['Technical Analysis: RSI'][daily]['RSI'])
-
-
-
-
-#Getting the EMA
-fp = "https://www.alphavantage.co/query?function=EMA&symbol="
-lp = "&interval=30min&time_period=180&series_type=close&apikey=LFUM3T5DS62ZKDC0"
-requestString = fp + ticker + lp
-data_ema = requests.get(requestString).json();
-
-print(data_ema)
-
-# Getting the MACD data
-fp = "https://www.alphavantage.co/query?function=MACD&symbol="
-lp = "&interval=1min&series_type=close&fastperiod=9&apikey=LFUM3T5DS62ZKDC0"
-requestString = fp + ticker + lp
-data_macd = requests.get(requestString).json()
-
-# print(data_macd)
-print(data_macd.keys())
-
-dataMACD = []
-dataMACDSig = []
-dataMACDHist = []
-
-for daily in data_macd['Technical Analysis: MACD']:
-    dataMACD.append(data_macd['Technical Analysis: MACD'][daily]['MACD'])
-    dataMACDSig.append(data_macd['Technical Analysis: MACD'][daily]['MACD_Signal'])
-    dataMACDHist.append(data_macd['Technical Analysis: MACD'][daily]['MACD_Hist'])
-
-# Getting the instraDay price data
-fp = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
-lp = "&interval=1min&apikey=LFUM3T5DS62ZKDC0"
-requestString = fp + ticker + lp
-data_price = requests.get(requestString).json()
-
-# # print(data_price)
-
-dataPRICE = []
+dataOPEN = []
+dataHIGH = []
+dataLOW = []
+dataCLOSE = []
+dataVOLUME = []
 dataDATE = []
 
-for daily in data_price['Time Series (1min)']:
-    dataPRICE.append(data_price['Time Series (1min)'][daily]['4. close'])
+for daily in data_time_series['Time Series (Daily)']:
+    dataOPEN.append(data_time_series['Time Series (Daily)'][daily]['1. open'])
+    dataHIGH.append(data_time_series['Time Series (Daily)'][daily]['2. high'])
+    dataLOW.append(data_time_series['Time Series (Daily)'][daily]['3. low'])
+    dataCLOSE.append(data_time_series['Time Series (Daily)'][daily]['4. close'])
+    dataVOLUME.append(data_time_series['Time Series (Daily)'][daily]['5. volume'])
     dataDATE.append(daily)
-#
-# # printing all off the data into a .txt file
-fileName = ticker + ".out"
+
+
+fp = "https://www.alphavantage.co/query?function=EMA&symbol="
+lp = "&interval=daily&time_period=9&series_type=close&apikey=LFUM3T5DS62ZKDC0"
+requestString = fp + ticker + lp
+data_ema = requests.get(requestString).json()
+
+dataEMA = []
+
+for daily in data_ema['Technical Analysis: EMA']:
+    dataEMA.append(data_ema['Technical Analysis: EMA'][daily]['EMA'])
+
+# printing all off the data into a .txt file
+fileName = ticker + ".txt"
 f = open(fileName, 'w')
-for value in range(len(dataPRICE)):
+for value in range(len(dataEMA)):
     f.write(dataDATE[value])
     f.write(" ")
-    f.write(dataPRICE[value])
+    f.write(dataOPEN[value])
     f.write(" ")
-    f.write(dataRSI[value])
+    f.write(dataHIGH[value])
     f.write(" ")
-    f.write(dataMACD[value])
+    f.write(dataLOW[value])
     f.write(" ")
-    f.write(dataMACDSig[value])
+    f.write(dataCLOSE[value])
     f.write(" ")
-    f.write(dataMACDHist[value])
+    f.write(dataEMA[value])
     f.write("\n")
 f.close()
-time.sleep(60)
